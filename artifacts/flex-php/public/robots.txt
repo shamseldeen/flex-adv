@@ -1,0 +1,6 @@
+User-agent: *
+Allow: /
+Disallow: /api/
+Disallow: /img.php
+
+Sitemap: https://ad-vision-pharmacian2050.replit.app/sitemap.xml

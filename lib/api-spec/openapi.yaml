@@ -1,0 +1,309 @@
+openapi: 3.1.0
+info:
+  title: Api
+  version: 0.1.0
+  description: Flex Advertising API
+servers:
+  - url: /api
+    description: Base API path
+tags:
+  - name: health
+    description: Health operations
+  - name: services
+    description: Advertising services
+  - name: portfolio
+    description: Portfolio and work samples
+  - name: contact
+    description: Contact and inquiries
+  - name: clients
+    description: Agency clients
+  - name: gallery
+    description: Project photo gallery
+paths:
+  /healthz:
+    get:
+      operationId: healthCheck
+      tags: [health]
+      summary: Health check
+      responses:
+        "200":
+          description: Healthy
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HealthStatus"
+
+  /services:
+    get:
+      operationId: listServices
+      tags: [services]
+      summary: List all advertising services
+      responses:
+        "200":
+          description: List of services
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Service"
+
+  /portfolio:
+    get:
+      operationId: listPortfolio
+      tags: [portfolio]
+      summary: List portfolio items
+      parameters:
+        - in: query
+          name: category
+          schema:
+            type: string
+          required: false
+      responses:
+        "200":
+          description: List of portfolio items
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/PortfolioItem"
+
+  /portfolio/{id}:
+    get:
+      operationId: getPortfolioItem
+      tags: [portfolio]
+      summary: Get single portfolio item
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: integer
+          required: true
+      responses:
+        "200":
+          description: Portfolio item details
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PortfolioItem"
+        "404":
+          description: Not found
+
+  /portfolio/categories:
+    get:
+      operationId: listPortfolioCategories
+      tags: [portfolio]
+      summary: List all portfolio categories with counts
+      responses:
+        "200":
+          description: Categories with counts
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Category"
+
+  /contact:
+    post:
+      operationId: submitContact
+      tags: [contact]
+      summary: Submit contact inquiry
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ContactInput"
+      responses:
+        "201":
+          description: Inquiry submitted
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ContactResponse"
+
+  /stats:
+    get:
+      operationId: getSiteStats
+      tags: [services]
+      summary: Get site statistics (projects count, clients, years)
+      responses:
+        "200":
+          description: Site stats
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SiteStats"
+
+  /clients:
+    get:
+      operationId: listClients
+      tags: [clients]
+      summary: List all agency clients
+      responses:
+        "200":
+          description: List of clients
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Client"
+
+  /gallery:
+    get:
+      operationId: listGallery
+      tags: [gallery]
+      summary: List gallery images
+      parameters:
+        - in: query
+          name: category
+          schema:
+            type: string
+          required: false
+      responses:
+        "200":
+          description: List of gallery images
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/GalleryItem"
+
+  /gallery/categories:
+    get:
+      operationId: listGalleryCategories
+      tags: [gallery]
+      summary: List gallery categories with counts
+      responses:
+        "200":
+          description: Gallery categories
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Category"
+
+components:
+  schemas:
+    HealthStatus:
+      type: object
+      properties:
+        status:
+          type: string
+      required:
+        - status
+
+    Service:
+      type: object
+      required: [id, title, description, icon]
+      properties:
+        id:
+          type: integer
+        title:
+          type: string
+        description:
+          type: string
+        icon:
+          type: string
+
+    PortfolioItem:
+      type: object
+      required: [id, title, category, imageUrl]
+      properties:
+        id:
+          type: integer
+        title:
+          type: string
+        category:
+          type: string
+        description:
+          type: ["string", "null"]
+        imageUrl:
+          type: string
+        client:
+          type: ["string", "null"]
+        year:
+          type: ["integer", "null"]
+
+    Category:
+      type: object
+      required: [name, count]
+      properties:
+        name:
+          type: string
+        count:
+          type: integer
+
+    ContactInput:
+      type: object
+      required: [name, phone, message]
+      properties:
+        name:
+          type: string
+        phone:
+          type: string
+        email:
+          type: ["string", "null"]
+        message:
+          type: string
+
+    ContactResponse:
+      type: object
+      required: [success, message]
+      properties:
+        success:
+          type: boolean
+        message:
+          type: string
+
+    SiteStats:
+      type: object
+      required: [projectsCount, clientsCount, yearsExperience, teamSize]
+      properties:
+        projectsCount:
+          type: integer
+        clientsCount:
+          type: integer
+        yearsExperience:
+          type: integer
+        teamSize:
+          type: integer
+
+    Client:
+      type: object
+      required: [id, name, sector]
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        sector:
+          type: string
+        logoUrl:
+          type: ["string", "null"]
+        website:
+          type: ["string", "null"]
+
+    GalleryItem:
+      type: object
+      required: [id, imageUrl, category]
+      properties:
+        id:
+          type: integer
+        imageUrl:
+          type: string
+        title:
+          type: ["string", "null"]
+        category:
+          type: string
+        service:
+          type: ["string", "null"]
+        year:
+          type: ["integer", "null"]
+        sortOrder:
+          type: ["integer", "null"]
