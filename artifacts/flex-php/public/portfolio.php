@@ -66,8 +66,8 @@ if (empty($portfolio)) {
 $totalPf = count($portfolio);
 
 /* Lightbox data — flatten cover + gallery per project */
-$lbData    = [];   /* flat array of all slides          */
-$cardStart = [];   /* cardStart[project_index] = flat lb index */
+$lbData    = [];
+$cardStart = [];
 
 foreach ($portfolio as $i => $item) {
     $cardStart[$i] = count($lbData);
@@ -87,716 +87,1117 @@ foreach ($portfolio as $i => $item) {
             'client'=> $client,
             'year'  => $year,
             'desc'  => $desc,
-            'gidx'  => $gi + 1,   /* 1-based position within project */
-            'gtotal'=> $total,     /* total images in project         */
+            'gidx'  => $gi + 1,
+            'gtotal'=> $total,
         ];
     }
 }
 $lbTotal = count($lbData);
+
+/* Grid span pattern helper (mirrors React getSpanClass) */
+function getSpanClass(int $index): string {
+    $pattern = [
+        'pf-span-wide',    // 0
+        'pf-span-tall',    // 1
+        'pf-span-normal',  // 2
+        'pf-span-normal',  // 3
+        'pf-span-normal',  // 4
+        'pf-span-wide',    // 5
+        'pf-span-tall',    // 6
+        'pf-span-normal',  // 7
+        'pf-span-normal',  // 8
+    ];
+    return $pattern[$index % count($pattern)];
+}
 ?>
 
-<!-- ═══ HERO ═══ -->
-<?php
-$heroBgs = [
-  '/images/portfolio/khayallah_facade_night_1.jpeg',
-  '/images/portfolio/express_motors_1.jpeg',
-  '/images/portfolio/inmar_facade.jpeg',
-  '/images/portfolio/enterprise_1.jpeg',
-  '/images/portfolio/theroof_1.jpeg',
-];
-?>
-<section class="pf-hero">
-  <div class="pf-hero-visual" id="pf-hero-visual">
-    <?php foreach ($heroBgs as $bi => $bg): ?>
-    <div class="pf-hero-slide<?= $bi === 0 ? ' active' : '' ?>">
-      <img src="<?= imgUrl($bg, 1600, 900, 68) ?>"
-           alt="" aria-hidden="true"
-           loading="<?= $bi === 0 ? 'eager' : 'lazy' ?>" />
-    </div>
-    <?php endforeach; ?>
-    <div class="pf-hero-veil"></div>
-    <!-- dot indicators -->
-    <div class="pf-hero-dots">
-      <?php foreach ($heroBgs as $bi => $_): ?>
-      <span class="pf-hdot<?= $bi === 0 ? ' on' : '' ?>"></span>
-      <?php endforeach; ?>
-    </div>
+<!-- ═══════════════════════════════════════
+     HERO — Cinematic 3D
+════════════════════════════════════════ -->
+<section class="pf3-hero">
+
+  <!-- SVG grid background -->
+  <div class="pf3-hero-bg" aria-hidden="true">
+    <svg class="pf3-grid-svg" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <pattern id="pg" width="60" height="60" patternUnits="userSpaceOnUse">
+          <path d="M 60 0 L 0 0 0 60" fill="none" stroke="white" stroke-width="0.5"/>
+        </pattern>
+      </defs>
+      <rect width="100%" height="100%" fill="url(#pg)"/>
+    </svg>
+    <div class="pf3-glow-top"></div>
+    <div class="pf3-glow-br"></div>
   </div>
 
-  <div class="container pf-hero-body">
-    <p class="pf-hero-eyebrow">
-      <span class="pf-hero-line"></span>
-      <?= $isAr ? 'معرض أعمالنا' : 'Our Portfolio' ?>
-    </p>
-    <h1 class="pf-hero-h1">
+  <!-- Floating stat chips -->
+  <div class="pf3-chip pf3-chip--tr pf3-chip--1">
+    <div class="pf3-chip-icon">
+      <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>
+    </div>
+    <div><p class="pf3-chip-val" dir="ltr">+2400</p><p class="pf3-chip-lbl"><?= $isAr ? 'مشروع ناجح' : 'Successful Projects' ?></p></div>
+  </div>
+  <div class="pf3-chip pf3-chip--tr pf3-chip--2">
+    <div class="pf3-chip-icon">
+      <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="8" r="6"/><path d="M15.477 12.89L17 22l-5-3-5 3 1.523-9.11"/></svg>
+    </div>
+    <div><p class="pf3-chip-val" dir="ltr">+300</p><p class="pf3-chip-lbl"><?= $isAr ? 'عميل راضٍ' : 'Satisfied Clients' ?></p></div>
+  </div>
+  <div class="pf3-chip pf3-chip--tl pf3-chip--3">
+    <div class="pf3-chip-icon">
+      <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+    </div>
+    <div><p class="pf3-chip-val" dir="ltr">+11</p><p class="pf3-chip-lbl"><?= $isAr ? 'سنوات خبرة' : 'Years Experience' ?></p></div>
+  </div>
+  <div class="pf3-chip pf3-chip--tl pf3-chip--4">
+    <div class="pf3-chip-icon">
+      <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+    </div>
+    <div><p class="pf3-chip-val" dir="ltr">+100</p><p class="pf3-chip-lbl"><?= $isAr ? 'براند يثق بنا' : 'Trusted Brands' ?></p></div>
+  </div>
+
+  <!-- Hero body -->
+  <div class="container pf3-hero-body">
+
+    <!-- Badge -->
+    <div class="pf3-badge">
+      <span class="pf3-badge-dot"></span>
+      <span class="pf3-badge-txt"><?= $isAr ? 'معرض أعمالنا' : 'Our Portfolio' ?></span>
+    </div>
+
+    <!-- Headline -->
+    <h1 class="pf3-h1">
       <?php if ($isAr): ?>
-        كل مشروع<br><em>قصة نجاح</em>
+        مشاريع <span class="pf3-h1-grad">مميزة<span class="pf3-h1-line"></span></span>
       <?php else: ?>
-        Every project<br><em>a success story</em>
+        Featured <span class="pf3-h1-grad">Projects<span class="pf3-h1-line"></span></span>
       <?php endif; ?>
     </h1>
-    <div class="pf-hero-foot">
-      <div class="pf-hero-stats">
-        <?php foreach([['+2400',$isAr?'مشروع':'Projects'],['+11',$isAr?'سنة':'Years'],['+300',$isAr?'عميل':'Clients']] as [$n,$l]): ?>
-        <div class="pf-stat">
-          <span class="pf-stat-n" dir="ltr"><?= $n ?></span>
-          <span class="pf-stat-l"><?= $l ?></span>
-        </div>
-        <?php endforeach; ?>
-      </div>
-      <a href="#pf-works" class="pf-hero-scroll">
-        <span><?= $isAr ? 'استعرض الأعمال' : 'Browse Work' ?></span>
-        <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
-          <line x1="12" y1="5" x2="12" y2="19"/><polyline points="19 12 12 19 5 12"/>
-        </svg>
-      </a>
+
+    <p class="pf3-hero-desc">
+      <?= $isAr
+        ? 'تصفح أرشيفنا المليء بالحملات الإعلانية الناجحة والمشاريع الإبداعية التي ساهمت في تغيير مسار علامات تجارية كبرى.'
+        : 'Browse our rich archive of successful advertising campaigns and creative projects that helped reshape major brands.' ?>
+    </p>
+
+    <!-- Scroll hint -->
+    <div class="pf3-scroll-hint">
+      <span class="pf3-scroll-line"></span>
+      <span class="pf3-scroll-txt"><?= $isAr ? 'تمرر لاستكشاف' : 'Scroll to explore' ?></span>
     </div>
   </div>
 </section>
 
-<!-- ═══ WORKS ═══ -->
-<section class="pf-works" id="pf-works">
+<!-- ═══════════════════════════════════════
+     STICKY FILTER BAR
+════════════════════════════════════════ -->
+<div class="pf3-filter-bar" id="pf3-filter">
   <div class="container">
+    <div class="pf3-filter-inner no-scrollbar">
 
-    <!-- Filter bar -->
-    <nav class="pf-nav" id="pf-nav" aria-label="<?= $isAr?'تصفية':'Filter' ?>">
-      <button class="pf-nav-btn active" data-cat="all">
-        <?= $isAr ? 'الكل' : 'All' ?>
-        <span class="pf-nav-count"><?= $totalPf ?></span>
+      <!-- All -->
+      <button class="pf3-fbtn pf3-fbtn--active" data-cat="all">
+        <span class="pf3-fbtn-bg"></span>
+        <span class="pf3-fbtn-inner">
+          <?= $isAr ? 'الكل' : 'All' ?>
+          <span class="pf3-fbtn-count">(<?= $totalPf ?>)</span>
+        </span>
       </button>
+
+      <span class="pf3-fdivider"></span>
+
       <?php foreach ($catCounts as $arCat => $info): ?>
-      <button class="pf-nav-btn" data-cat="<?= htmlspecialchars($arCat) ?>">
-        <?= htmlspecialchars($isAr ? $arCat : $info['en']) ?>
-        <span class="pf-nav-count"><?= $info['cnt'] ?></span>
+      <button class="pf3-fbtn" data-cat="<?= htmlspecialchars($arCat) ?>">
+        <span class="pf3-fbtn-bg"></span>
+        <span class="pf3-fbtn-inner">
+          <?= htmlspecialchars($isAr ? $arCat : $info['en']) ?>
+          <span class="pf3-fbtn-count">(<?= $info['cnt'] ?>)</span>
+        </span>
       </button>
       <?php endforeach; ?>
-    </nav>
 
-    <!-- Grid -->
-    <div class="pf-grid" id="pf-grid">
-      <?php foreach ($portfolio as $i => $item):
-        $title   = $isAr ? $item['title'] : ($item['title_en'] ?: $item['title']);
-        $cat     = $isAr ? $item['category'] : ($item['category_en'] ?: $item['category']);
-        $gallery = json_decode($item['gallery'] ?? '[]', true) ?: [];
-        $imgCount = count($gallery) + 1;   /* cover + gallery */
-        $isFeat   = ($i % 7 === 0);
-        $flatIdx  = $cardStart[$i];        /* starting index in flat lb array */
-      ?>
-      <article class="pf-item<?= $isFeat ? ' pf-item--feat' : '' ?> pf-in"
-               data-cat="<?= htmlspecialchars($item['category']) ?>"
-               data-idx="<?= $flatIdx ?>">
-
-        <div class="pf-item-img">
-          <img src="<?= imgUrl($item['image_url'], $isFeat ? 900 : 600, $isFeat ? 600 : 450, 82) ?>"
-               alt="<?= htmlspecialchars($title) ?>"
-               loading="<?= $i < 8 ? 'eager' : 'lazy' ?>"
-               onerror="this.parentElement.style.background='#1a1a1a';this.style.display='none'" />
-          <?php if ($imgCount > 1): ?>
-          <span class="pf-img-count">
-            <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" style="display:inline-block;vertical-align:middle;margin-<?= $isAr?'left':'right' ?>:3px"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18"/><path d="M9 21V9"/></svg>
-            <?= $imgCount ?>
-          </span>
-          <?php endif; ?>
-        </div>
-
-        <div class="pf-item-layer">
-          <div class="pf-item-body">
-            <span class="pf-item-cat"><?= htmlspecialchars($cat) ?></span>
-            <h2 class="pf-item-title"><?= htmlspecialchars($title) ?></h2>
-            <div class="pf-item-meta">
-              <?php if (!empty($item['client'])): ?><span><?= htmlspecialchars($item['client']) ?></span><?php endif; ?>
-              <?php if (!empty($item['year'])): ?><span class="pf-meta-sep">·</span><span dir="ltr"><?= (int)$item['year'] ?></span><?php endif; ?>
-            </div>
-          </div>
-          <div class="pf-item-icon">
-            <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
-              <polyline points="<?= $isAr ? '15 18 9 12 15 6' : '9 18 15 12 9 6' ?>"/>
-            </svg>
-          </div>
-        </div>
-
-        <span class="pf-item-idx" dir="ltr"><?= str_pad($i+1,2,'0',STR_PAD_LEFT) ?></span>
-      </article>
-      <?php endforeach; ?>
-    </div>
-
-    <!-- Empty -->
-    <div id="pf-empty" class="pf-empty" style="display:none">
-      <p><?= $isAr ? 'لا توجد مشاريع في هذه الفئة' : 'No projects in this category' ?></p>
-      <button id="pf-reset"><?= $isAr ? 'عرض الكل' : 'Show All' ?></button>
-    </div>
-
-  </div>
-</section>
-
-<!-- ═══ LIGHTBOX ═══ -->
-<div id="lb" role="dialog" aria-modal="true">
-  <div class="lb-bg" id="lb-bg"></div>
-  <div class="lb-overlay" id="lb-overlay"></div>
-
-  <button class="lb-btn lb-close" id="lb-close">
-    <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
-      <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
-    </svg>
-  </button>
-
-  <div class="lb-counter" id="lb-counter" dir="ltr">
-    <span id="lb-gcur">1</span> / <span id="lb-gtotal">1</span>
-  </div>
-
-  <button class="lb-btn lb-arrow lb-prev" id="lb-prev">
-    <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
-  </button>
-  <button class="lb-btn lb-arrow lb-next" id="lb-next">
-    <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
-  </button>
-
-  <div class="lb-stage">
-    <div class="lb-img-wrap" id="lb-img-wrap">
-      <img id="lb-img" src="" alt="" />
-    </div>
-    <div class="lb-info" id="lb-info">
-      <span class="lb-cat" id="lb-cat"></span>
-      <h2 class="lb-title" id="lb-title"></h2>
-      <div class="lb-meta" id="lb-meta"></div>
-      <p class="lb-desc" id="lb-desc"></p>
-      <a href="/contact<?= $langSuffix ?>" class="lb-cta">
-        <?= $isAr ? 'اطلب مشروعاً مماثلاً ←' : 'Request Similar →' ?>
-      </a>
     </div>
   </div>
 </div>
 
-<!-- ═══ CTA STRIP ═══ -->
-<section class="pf-cta">
-  <div class="container pf-cta-inner">
-    <h2><?= $isAr ? 'هل لديك مشروع؟' : 'Have a project?' ?></h2>
-    <p><?= $isAr ? 'دعنا نحوّله إلى واقع' : 'Let us bring it to life' ?></p>
-    <div class="pf-cta-btns">
-      <a href="/contact<?= $langSuffix ?>" class="btn-primary"><?= $isAr ? 'ابدأ الآن' : 'Get Started' ?></a>
-      <a href="https://wa.me/966563538520" target="_blank" class="pf-cta-wa">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M11.984 0C5.374 0 0 5.373 0 11.984c0 2.093.544 4.056 1.491 5.764L0 24l6.375-1.471C8.032 23.471 9.975 24 11.984 24 18.594 24 18.627 24 24 12.016 24 5.373 18.594 0 11.984 0zm0 21.818c-1.878 0-3.637-.508-5.145-1.388l-.371-.222-3.786.871.891-3.682-.24-.38a9.793 9.793 0 01-1.498-5.233c0-5.411 4.405-9.816 9.816-9.816 5.412 0 9.817 4.405 9.817 9.816 0 5.41-4.405 9.834-9.484 9.834z"/></svg>
-        واتساب
-      </a>
+<!-- ═══════════════════════════════════════
+     PORTFOLIO GRID — Editorial 3D
+════════════════════════════════════════ -->
+<section class="pf3-works" id="pf-works">
+  <div class="container">
+
+    <div class="pf3-grid" id="pf3-grid">
+      <?php foreach ($portfolio as $i => $item):
+        $title   = $isAr ? $item['title'] : ($item['title_en'] ?: $item['title']);
+        $cat     = $isAr ? $item['category'] : ($item['category_en'] ?: $item['category']);
+        $gallery = json_decode($item['gallery'] ?? '[]', true) ?: [];
+        $flatIdx = $cardStart[$i];
+        $spanCls = getSpanClass($i);
+        $padIdx  = str_pad($i+1, 2, '0', STR_PAD_LEFT);
+      ?>
+      <article class="pf3-item <?= $spanCls ?> pf3-in"
+               data-cat="<?= htmlspecialchars($item['category']) ?>"
+               data-idx="<?= $flatIdx ?>"
+               data-tilt>
+
+        <!-- Image -->
+        <div class="pf3-item-inner">
+          <div class="pf3-item-img-wrap">
+            <img class="pf3-item-img"
+                 src="<?= imgUrl($item['image_url'], 800, 600, 82) ?>"
+                 alt="<?= htmlspecialchars($title) ?>"
+                 loading="<?= $i < 6 ? 'eager' : 'lazy' ?>"
+                 onerror="this.closest('.pf3-item-img-wrap').style.background='#1a1a1a';this.style.display='none'" />
+          </div>
+
+          <!-- Dark gradient -->
+          <div class="pf3-item-veil"></div>
+
+          <!-- Mouse glare -->
+          <div class="pf3-item-glare" aria-hidden="true"></div>
+
+          <!-- Brand top line (appears on hover) -->
+          <div class="pf3-item-topline"></div>
+
+          <!-- Category chip -->
+          <div class="pf3-item-cat-chip">
+            <?= htmlspecialchars($cat) ?>
+          </div>
+
+          <!-- Index number -->
+          <div class="pf3-item-idx" dir="ltr"><?= $padIdx ?></div>
+
+          <!-- Bottom content -->
+          <div class="pf3-item-body">
+            <h2 class="pf3-item-title"><?= htmlspecialchars($title) ?></h2>
+            <?php if (!empty($item['client']) || !empty($item['year'])): ?>
+            <p class="pf3-item-meta">
+              <?php if (!empty($item['client'])): ?>
+                <span class="pf3-meta-dot"></span>
+                <span><?= htmlspecialchars($item['client']) ?></span>
+              <?php endif; ?>
+              <?php if (!empty($item['year'])): ?>
+                <span class="pf3-meta-yr" dir="ltr"><?= (int)$item['year'] ?></span>
+              <?php endif; ?>
+            </p>
+            <?php endif; ?>
+            <!-- View hint -->
+            <div class="pf3-item-hint">
+              <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+              <span><?= $isAr ? 'عرض التفاصيل' : 'View Details' ?></span>
+            </div>
+          </div>
+
+          <!-- Corner accent -->
+          <div class="pf3-corner"></div>
+        </div>
+      </article>
+      <?php endforeach; ?>
     </div>
+
+    <!-- Empty state -->
+    <div id="pf3-empty" class="pf3-empty" style="display:none">
+      <div class="pf3-empty-icon">
+        <svg width="40" height="40" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><rect x="2" y="3" width="6" height="6"/><rect x="9" y="3" width="6" height="6"/><rect x="16" y="3" width="6" height="6"/><rect x="2" y="10" width="6" height="6"/><rect x="9" y="10" width="6" height="6"/><rect x="16" y="10" width="6" height="6"/><rect x="2" y="17" width="6" height="6"/><rect x="9" y="17" width="6" height="6"/><rect x="16" y="17" width="6" height="6"/></svg>
+      </div>
+      <h3><?= $isAr ? 'لا توجد مشاريع في هذه الفئة' : 'No projects in this category' ?></h3>
+      <button id="pf3-reset"><?= $isAr ? 'عرض جميع المشاريع' : 'Show All Projects' ?></button>
+    </div>
+
   </div>
 </section>
 
+<!-- ═══════════════════════════════════════
+     STATS + CTA SECTION
+════════════════════════════════════════ -->
+<section class="pf3-stats-cta">
+  <!-- Dot pattern bg -->
+  <div class="pf3-dots-bg" aria-hidden="true">
+    <svg width="100%" height="100%"><defs><pattern id="pd" x="0" y="0" width="30" height="30" patternUnits="userSpaceOnUse"><circle cx="1" cy="1" r="1" fill="white"/></pattern></defs><rect width="100%" height="100%" fill="url(#pd)"/></svg>
+  </div>
+
+  <div class="container pf3-sc-inner">
+
+    <!-- Stats grid -->
+    <div class="pf3-stats-grid pf3-anim-in">
+      <?php
+      $stats = [
+        ['+2400', $isAr?'مشروع ناجح':'Successful Projects', '<polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/>'],
+        ['+11',   $isAr?'سنوات خبرة':'Years Experience',   '<rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/>'],
+        ['+300',  $isAr?'عميل راضٍ':'Satisfied Clients',  '<circle cx="12" cy="8" r="6"/><path d="M15.477 12.89L17 22l-5-3-5 3 1.523-9.11"/>'],
+        ['+100',  $isAr?'براند يثق بنا':'Trusted Brands',  '<path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/>'],
+      ];
+      foreach ($stats as $k => [$val, $lbl, $svgInner]): ?>
+      <div class="pf3-stat-card" style="animation-delay:<?= $k * 0.1 ?>s">
+        <div class="pf3-stat-topline"></div>
+        <div class="pf3-stat-icon">
+          <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><?= $svgInner ?></svg>
+        </div>
+        <p class="pf3-stat-val" dir="ltr"><?= $val ?></p>
+        <p class="pf3-stat-lbl"><?= $lbl ?></p>
+      </div>
+      <?php endforeach; ?>
+    </div>
+
+    <!-- CTA block -->
+    <div class="pf3-cta-block pf3-anim-in" style="animation-delay:0.4s">
+      <div class="pf3-cta-glow"></div>
+      <div class="pf3-cta-grad"></div>
+      <div class="pf3-cta-content">
+        <div class="pf3-cta-left">
+          <p class="pf3-cta-eyebrow"><?= $isAr ? 'ابدأ مشروعك' : 'START YOUR PROJECT' ?></p>
+          <h3 class="pf3-cta-h3">
+            <?= $isAr
+              ? 'هل لديك مشروع <span class="pf3-grad-txt">تريد تنفيذه؟</span>'
+              : 'Got a Project in <span class="pf3-grad-txt">Mind?</span>' ?>
+          </h3>
+          <p class="pf3-cta-desc">
+            <?= $isAr
+              ? 'دعنا نحوّل رؤيتك إلى واقع. من الفكرة حتى التركيب النهائي — نحن نتولى كل شيء.'
+              : 'Let\'s turn your vision into reality. From concept to installation — we handle everything.' ?>
+          </p>
+        </div>
+        <div class="pf3-cta-right">
+          <a href="https://wa.me/966563538520" target="_blank" rel="noopener" class="pf3-cta-btn-primary">
+            <?= $isAr ? 'ابدأ الآن' : 'Start Now' ?>
+            <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 5 5 12 12 19"/></svg>
+          </a>
+          <a href="/gallery<?= $langSuffix ?>" class="pf3-cta-btn-sec">
+            <?= $isAr ? 'معرض الصور' : 'View Gallery' ?>
+          </a>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════
+     LIGHTBOX (fullscreen modal)
+════════════════════════════════════════ -->
+<div id="lb3" role="dialog" aria-modal="true">
+  <div class="lb3-bg" id="lb3-bg"></div>
+  <div class="lb3-overlay" id="lb3-overlay"></div>
+
+  <!-- Close -->
+  <button class="lb3-btn lb3-close" id="lb3-close" aria-label="<?= $isAr?'إغلاق':'Close' ?>">
+    <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+      <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+    </svg>
+  </button>
+
+  <!-- Counter -->
+  <div class="lb3-counter" id="lb3-counter" dir="ltr">
+    <span id="lb3-gcur">1</span> / <span id="lb3-gtotal">1</span>
+  </div>
+
+  <!-- Arrows -->
+  <button class="lb3-btn lb3-arrow lb3-prev" id="lb3-prev">
+    <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
+  </button>
+  <button class="lb3-btn lb3-arrow lb3-next" id="lb3-next">
+    <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
+  </button>
+
+  <!-- Stage -->
+  <div class="lb3-stage">
+    <div class="lb3-img-wrap" id="lb3-img-wrap">
+      <img id="lb3-img" src="" alt="" />
+    </div>
+    <div class="lb3-info" id="lb3-info">
+      <div class="lb3-info-line"></div>
+      <span class="lb3-cat" id="lb3-cat"></span>
+      <h2 class="lb3-title" id="lb3-title"></h2>
+      <div class="lb3-meta" id="lb3-meta"></div>
+      <p class="lb3-desc" id="lb3-desc"></p>
+      <div class="lb3-meta-grid">
+        <div class="lb3-meta-cell">
+          <p class="lb3-meta-lbl"><?= $isAr ? 'التصنيف' : 'Category' ?></p>
+          <p class="lb3-meta-val" id="lb3-cat2"></p>
+        </div>
+        <div class="lb3-meta-cell" id="lb3-year-cell">
+          <p class="lb3-meta-lbl"><?= $isAr ? 'السنة' : 'Year' ?></p>
+          <p class="lb3-meta-val lb3-meta-dir" id="lb3-year"></p>
+        </div>
+      </div>
+      <a href="https://wa.me/966563538520" target="_blank" rel="noopener" class="lb3-cta">
+        <?= $isAr ? 'اطلب مشروعاً مماثلاً' : 'Request Similar Project' ?>
+        <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 5 5 12 12 19"/></svg>
+      </a>
+      <!-- Prev/Next inside modal -->
+      <div class="lb3-nav">
+        <button class="lb3-nav-btn" id="lb3-prev2">
+          <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
+          <?= $isAr ? 'السابق' : 'Prev' ?>
+        </button>
+        <span id="lb3-nav-counter" dir="ltr" class="lb3-nav-ctr"></span>
+        <button class="lb3-nav-btn" id="lb3-next2">
+          <?= $isAr ? 'التالي' : 'Next' ?>
+          <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <script>
-/* ── Hero slideshow ── */
+/* ════════════════════════
+   FILTER
+════════════════════════ */
 (function(){
-  var slides = document.querySelectorAll('.pf-hero-slide');
-  var dots   = document.querySelectorAll('.pf-hdot');
-  var n = slides.length, cur = 0;
-  if (n < 2) return;
-  setInterval(function(){
-    slides[cur].classList.remove('active');
-    dots[cur].classList.remove('on');
-    cur = (cur + 1) % n;
-    slides[cur].classList.add('active');
-    dots[cur].classList.add('on');
-    /* restart drift animation */
-    var img = slides[cur].querySelector('img');
-    if (img) { img.style.animation = 'none'; void img.offsetWidth; img.style.animation = ''; }
-  }, 5000);
+  var btns  = document.querySelectorAll('.pf3-fbtn');
+  var cards = document.querySelectorAll('.pf3-item');
+  var empty = document.getElementById('pf3-empty');
+  var cur   = 'all';
+
+  function applyFilter(){
+    var vis = 0;
+    cards.forEach(function(c){
+      var show = cur==='all' || c.dataset.cat===cur;
+      c.style.display = show ? '' : 'none';
+      if (show) vis++;
+    });
+    if (empty) empty.style.display = vis===0 ? 'flex' : 'none';
+  }
+
+  btns.forEach(function(btn){
+    btn.addEventListener('click', function(){
+      btns.forEach(function(b){ b.classList.remove('pf3-fbtn--active'); });
+      btn.classList.add('pf3-fbtn--active');
+      cur = btn.dataset.cat;
+      applyFilter();
+    });
+  });
+
+  document.getElementById('pf3-reset')?.addEventListener('click', function(){
+    cur='all';
+    btns.forEach(function(b){ b.classList.toggle('pf3-fbtn--active', b.dataset.cat==='all'); });
+    applyFilter();
+  });
 })();
 
+/* ════════════════════════
+   SCROLL-IN
+════════════════════════ */
+(function(){
+  var els = document.querySelectorAll('.pf3-in, .pf3-anim-in');
+  if (!window.IntersectionObserver){ els.forEach(function(e){ e.classList.add('pf3-in--vis'); }); return; }
+  var io = new IntersectionObserver(function(ent){
+    ent.forEach(function(e){ if(e.isIntersecting){ e.target.classList.add('pf3-in--vis'); io.unobserve(e.target); } });
+  },{threshold:.07});
+  els.forEach(function(e){ io.observe(e); });
+})();
+
+/* ════════════════════════
+   3D TILT
+════════════════════════ */
+(function(){
+  document.querySelectorAll('[data-tilt]').forEach(function(card){
+    var inner = card.querySelector('.pf3-item-inner');
+    var glare = card.querySelector('.pf3-item-glare');
+    var img   = card.querySelector('.pf3-item-img');
+    if (!inner) return;
+    inner.style.transition = 'transform .1s ease';
+    img && (img.style.transition = 'transform .35s ease');
+
+    card.addEventListener('mousemove', function(e){
+      var r = card.getBoundingClientRect();
+      var x = (e.clientX - r.left) / r.width  - 0.5;
+      var y = (e.clientY - r.top)  / r.height - 0.5;
+      inner.style.transform = 'perspective(900px) rotateY('+( x*10)+'deg) rotateX('+(-y*8)+'deg) scale3d(1.03,1.03,1.03)';
+      if (img) img.style.transform = 'scale(1.08)';
+      if (glare) {
+        glare.style.background = 'radial-gradient(circle at '+((x+0.5)*100)+'% '+((y+0.5)*100)+'%, rgba(240,90,40,0.55) 0%, transparent 65%)';
+        glare.style.opacity = '1';
+      }
+    });
+
+    card.addEventListener('mouseleave', function(){
+      inner.style.transition = 'transform .5s cubic-bezier(.22,1,.36,1)';
+      inner.style.transform  = 'perspective(900px) rotateY(0deg) rotateX(0deg) scale3d(1,1,1)';
+      if (img){ img.style.transition='transform .5s ease'; img.style.transform='scale(1)'; }
+      if (glare){ glare.style.opacity='0'; }
+    });
+  });
+})();
+
+/* ════════════════════════
+   HERO chip float
+════════════════════════ */
+(function(){
+  var chips = document.querySelectorAll('.pf3-chip');
+  chips.forEach(function(c,i){
+    c.style.animation = 'pf3-float '+(3.5+i*0.7)+'s ease-in-out infinite alternate';
+    c.style.animationDelay = (i*0.4)+'s';
+  });
+})();
+
+/* ════════════════════════
+   LIGHTBOX
+════════════════════════ */
 var LB_DATA  = <?= json_encode($lbData, JSON_UNESCAPED_UNICODE) ?>;
 var LB_TOTAL = <?= $lbTotal ?>;
 var LB_IDX   = 0;
 var LB_OPEN  = false;
 var IS_AR    = <?= $isAr ? 'true' : 'false' ?>;
+var LB_PROJECT_IDX = 0;    /* index in portfolio[] */
+var LB_PROJECT_TOTAL = <?= $totalPf ?>;
 
-/* ── Scroll-in animation ── */
-(function(){
-  var els = document.querySelectorAll('.pf-in');
-  if (!window.IntersectionObserver) { els.forEach(function(e){ e.classList.add('pf-in--vis'); }); return; }
-  var io = new IntersectionObserver(function(ent){
-    ent.forEach(function(e){ if(e.isIntersecting){ e.target.classList.add('pf-in--vis'); io.unobserve(e.target); } });
-  }, {threshold:.07});
-  els.forEach(function(e){ io.observe(e); });
-})();
+/* Map flat lb index → project index */
+var CARD_STARTS = <?= json_encode(array_values($cardStart)) ?>;
 
-/* ── Card click → lightbox ── */
-document.querySelectorAll('.pf-item').forEach(function(card){
+function lbGetProjectIdx(flatIdx){
+  var pi = 0;
+  for (var i=0; i<CARD_STARTS.length; i++){
+    if (CARD_STARTS[i] <= flatIdx) pi=i; else break;
+  }
+  return pi;
+}
+
+document.querySelectorAll('.pf3-item').forEach(function(card){
   card.addEventListener('click', function(){ lbOpen(parseInt(card.dataset.idx)); });
 });
 
-/* ── LIGHTBOX ── */
-var lb    = document.getElementById('lb');
-var lbImg = document.getElementById('lb-img');
-var lbBg  = document.getElementById('lb-bg');
-var lbWrap= document.getElementById('lb-img-wrap');
-var lbCur = document.getElementById('lb-cur');
+var lb3     = document.getElementById('lb3');
+var lb3Img  = document.getElementById('lb3-img');
+var lb3Bg   = document.getElementById('lb3-bg');
+var lb3Wrap = document.getElementById('lb3-img-wrap');
 
 function lbOpen(idx){
-  LB_IDX = (idx % LB_TOTAL + LB_TOTAL) % LB_TOTAL;
-  lb.classList.add('lb--open');
-  document.body.style.overflow = 'hidden';
-  LB_OPEN = true;
+  LB_IDX = ((idx % LB_TOTAL) + LB_TOTAL) % LB_TOTAL;
+  LB_PROJECT_IDX = lbGetProjectIdx(LB_IDX);
+  lb3.classList.add('lb3--open');
+  document.body.style.overflow='hidden';
+  LB_OPEN=true;
   lbRender(true);
 }
 function lbClose(){
-  lb.classList.remove('lb--open');
-  document.body.style.overflow = '';
-  LB_OPEN = false;
-  setTimeout(function(){ lbImg.src=''; if(lbBg) lbBg.style.backgroundImage=''; }, 300);
+  lb3.classList.remove('lb3--open');
+  document.body.style.overflow='';
+  LB_OPEN=false;
+  setTimeout(function(){ lb3Img.src=''; if(lb3Bg) lb3Bg.style.backgroundImage=''; }, 300);
 }
-function lbGo(dir){
-  lbWrap.classList.add('lb--fade');
+/* Navigate within current project's gallery */
+function lbGoGallery(dir){
+  lb3Wrap.classList.add('lb3--fade');
   LB_IDX = ((LB_IDX + dir) % LB_TOTAL + LB_TOTAL) % LB_TOTAL;
-  setTimeout(function(){ lbRender(false); lbWrap.classList.remove('lb--fade'); }, 200);
+  LB_PROJECT_IDX = lbGetProjectIdx(LB_IDX);
+  setTimeout(function(){ lbRender(false); lb3Wrap.classList.remove('lb3--fade'); }, 200);
 }
+/* Navigate to prev/next project */
+function lbGoProject(dir){
+  lb3Wrap.classList.add('lb3--fade');
+  var newPi = ((LB_PROJECT_IDX + dir) % LB_PROJECT_TOTAL + LB_PROJECT_TOTAL) % LB_PROJECT_TOTAL;
+  LB_IDX = CARD_STARTS[newPi];
+  LB_PROJECT_IDX = newPi;
+  setTimeout(function(){ lbRender(false); lb3Wrap.classList.remove('lb3--fade'); }, 200);
+}
+
 function lbRender(fast){
   var d = LB_DATA[LB_IDX];
   if (!d) return;
-  if (lbBg) lbBg.style.backgroundImage = 'url('+d.img+')';
-  if (!fast){ lbImg.style.opacity='0'; }
-  lbImg.src = d.img; lbImg.alt = d.title;
-  lbImg.onload = function(){ lbImg.style.transition='opacity .35s'; lbImg.style.opacity='1'; };
-  if (fast) lbImg.style.opacity='';
-  var gcur   = document.getElementById('lb-gcur');
-  var gtotal = document.getElementById('lb-gtotal');
-  if (gcur)   gcur.textContent   = d.gidx;
-  if (gtotal) gtotal.textContent = d.gtotal;
-  var cat  = document.getElementById('lb-cat');
-  var ttl  = document.getElementById('lb-title');
-  var meta = document.getElementById('lb-meta');
-  var desc = document.getElementById('lb-desc');
-  if (cat)  cat.textContent  = d.cat;
-  if (ttl)  ttl.textContent  = d.title;
-  if (meta) {
-    var m = [];
-    if (d.client) m.push(d.client);
-    if (d.year)   m.push(d.year);
-    meta.textContent = m.join('  ·  ');
-    meta.style.display = m.length ? '' : 'none';
+  if (lb3Bg) lb3Bg.style.backgroundImage='url('+d.img+')';
+  if (!fast) lb3Img.style.opacity='0';
+  lb3Img.src=d.img; lb3Img.alt=d.title;
+  lb3Img.onload=function(){ lb3Img.style.transition='opacity .35s'; lb3Img.style.opacity='1'; };
+  if (fast) lb3Img.style.opacity='';
+
+  var el=function(id){ return document.getElementById(id); };
+  var gcur=el('lb3-gcur'), gtot=el('lb3-gtotal');
+  if(gcur) gcur.textContent=d.gidx;
+  if(gtot) gtot.textContent=d.gtotal;
+
+  var cat=el('lb3-cat'), cat2=el('lb3-cat2'), ttl=el('lb3-title');
+  var meta=el('lb3-meta'), desc=el('lb3-desc');
+  var yr=el('lb3-year'), yrCell=el('lb3-year-cell');
+  var navCtr=el('lb3-nav-counter');
+
+  if(cat)  cat.textContent=d.cat;
+  if(cat2) cat2.textContent=d.cat;
+  if(ttl)  ttl.textContent=d.title;
+  if(yr)   yr.textContent=d.year||'';
+  if(yrCell) yrCell.style.display=d.year?'':'none';
+  if(meta){
+    var m=[]; if(d.client) m.push(d.client); if(d.year) m.push(d.year);
+    meta.textContent=m.join(' · '); meta.style.display=m.length?'':'none';
   }
-  if (desc) { desc.textContent = d.desc; desc.style.display = d.desc ? '' : 'none'; }
+  if(desc){ desc.textContent=d.desc; desc.style.display=d.desc?'':'none'; }
+  if(navCtr) navCtr.textContent=(LB_PROJECT_IDX+1)+' / '+LB_PROJECT_TOTAL;
 }
 
-document.getElementById('lb-close')?.addEventListener('click', lbClose);
-document.getElementById('lb-overlay')?.addEventListener('click', lbClose);
-document.getElementById('lb-prev')?.addEventListener('click', function(e){ e.stopPropagation(); lbGo(-1); });
-document.getElementById('lb-next')?.addEventListener('click', function(e){ e.stopPropagation(); lbGo(1); });
+document.getElementById('lb3-close')?.addEventListener('click', lbClose);
+document.getElementById('lb3-overlay')?.addEventListener('click', lbClose);
+document.getElementById('lb3-prev')?.addEventListener('click', function(e){ e.stopPropagation(); lbGoGallery(IS_AR?1:-1); });
+document.getElementById('lb3-next')?.addEventListener('click', function(e){ e.stopPropagation(); lbGoGallery(IS_AR?-1:1); });
+document.getElementById('lb3-prev2')?.addEventListener('click', function(e){ e.stopPropagation(); lbGoProject(IS_AR?1:-1); });
+document.getElementById('lb3-next2')?.addEventListener('click', function(e){ e.stopPropagation(); lbGoProject(IS_AR?-1:1); });
+
 document.addEventListener('keydown', function(e){
   if (!LB_OPEN) return;
-  if (e.key==='Escape')    lbClose();
-  if (e.key==='ArrowLeft') lbGo(IS_AR ? 1 : -1);
-  if (e.key==='ArrowRight')lbGo(IS_AR ? -1 : 1);
+  if (e.key==='Escape')     lbClose();
+  if (e.key==='ArrowLeft')  lbGoGallery(IS_AR?1:-1);
+  if (e.key==='ArrowRight') lbGoGallery(IS_AR?-1:1);
+  if (e.key==='ArrowUp')    lbGoProject(-1);
+  if (e.key==='ArrowDown')  lbGoProject(1);
 });
 var _sx=0;
-lb?.addEventListener('touchstart',function(e){_sx=e.touches[0].clientX;},{passive:true});
-lb?.addEventListener('touchend',function(e){var dx=e.changedTouches[0].clientX-_sx;if(Math.abs(dx)>44)lbGo(dx<0?1:-1);},{passive:true});
-
-/* ── FILTER ── */
-var navBtns = document.querySelectorAll('.pf-nav-btn');
-var cards   = document.querySelectorAll('.pf-item');
-var empty   = document.getElementById('pf-empty');
-var curCat  = 'all';
-
-function applyFilter(){
-  var vis = 0;
-  cards.forEach(function(c){
-    var show = curCat === 'all' || c.dataset.cat === curCat;
-    c.style.display = show ? '' : 'none';
-    if (show) vis++;
-  });
-  if (empty) empty.style.display = vis===0 ? 'block' : 'none';
-}
-navBtns.forEach(function(btn){
-  btn.addEventListener('click', function(){
-    navBtns.forEach(function(b){ b.classList.remove('active'); });
-    btn.classList.add('active');
-    curCat = btn.dataset.cat;
-    applyFilter();
-  });
-});
-document.getElementById('pf-reset')?.addEventListener('click', function(){
-  curCat='all';
-  navBtns.forEach(function(b){ b.classList.toggle('active', b.dataset.cat==='all'); });
-  applyFilter();
-});
+lb3?.addEventListener('touchstart',function(e){_sx=e.touches[0].clientX;},{passive:true});
+lb3?.addEventListener('touchend',  function(e){var dx=e.changedTouches[0].clientX-_sx;if(Math.abs(dx)>44)lbGoGallery(dx<0?1:-1);},{passive:true});
 </script>
 
 <style>
-/* ════════════════════════════════
-   PORTFOLIO v2 — Clean & Professional
-════════════════════════════════ */
+/* ═══════════════════════════════════════════════
+   PF3 — Portfolio 3D Design
+═══════════════════════════════════════════════ */
 
 /* ── Hero ── */
-.pf-hero {
+.pf3-hero {
   position: relative;
-  height: clamp(560px, 85vh, 900px);
-  display: flex; align-items: flex-end;
+  min-height: 72vh;
+  display: flex;
+  align-items: flex-end;
+  padding: 10rem 0 5rem;
   overflow: hidden;
+  background: #030303;
 }
-.pf-hero-visual {
-  position: absolute; inset: 0;
+.pf3-hero-bg {
+  position: absolute; inset: 0; pointer-events: none; overflow: hidden;
+}
+.pf3-grid-svg {
+  position: absolute; inset: 0; width: 100%; height: 100%;
+  opacity: .04;
+}
+.pf3-glow-top {
+  position: absolute; top: 0; left: 50%; transform: translateX(-50%);
+  width: 900px; height: 600px; border-radius: 50%;
+  background: radial-gradient(ellipse, rgba(232,40,30,.08) 0%, transparent 70%);
+  filter: blur(60px);
+}
+.pf3-glow-br {
+  position: absolute; bottom: 0; right: 0;
+  width: 500px; height: 400px; border-radius: 50%;
+  background: radial-gradient(ellipse, rgba(240,90,40,.05) 0%, transparent 70%);
+  filter: blur(80px);
 }
 
-/* Slides */
-.pf-hero-slide {
-  position: absolute; inset: 0;
-  opacity: 0;
-  transition: opacity 1.6s ease;
+/* Floating stat chips */
+.pf3-chip {
+  position: absolute; display: none;
+  align-items: center; gap: 10px;
+  background: rgba(255,255,255,.04);
+  border: 1px solid rgba(255,255,255,.08);
+  padding: 10px 16px;
+  backdrop-filter: blur(8px);
 }
-.pf-hero-slide.active { opacity: 1; }
-.pf-hero-slide img {
-  width: 100%; height: 100%; object-fit: cover;
-  transform: scale(1.06);
-  animation: pf-drift 18s ease-in-out alternate infinite;
+@media (min-width: 1024px){ .pf3-chip { display: flex; } }
+.pf3-chip--tr { right: 4%; }
+.pf3-chip--tl { left: 4%; }
+.pf3-chip--1  { top: 28%; }
+.pf3-chip--2  { top: 22%; }
+.pf3-chip--3  { top: 35%; }
+.pf3-chip--4  { top: 42%; }
+.pf3-chip-icon {
+  width: 28px; height: 28px; flex-shrink: 0;
+  background: linear-gradient(135deg,#E8281E,#F05A28);
+  display: flex; align-items: center; justify-content: center;
+  color: #fff;
 }
-@keyframes pf-drift {
-  from { transform: scale(1.06) translateX(0); }
-  to   { transform: scale(1.06) translateX(-2%); }
-}
-.pf-hero-veil {
-  position: absolute; inset: 0; z-index: 2;
-  background:
-    linear-gradient(to top,  #040404 0%, rgba(4,4,4,1) 28%, rgba(4,4,4,.82) 52%, rgba(4,4,4,.5) 75%, rgba(4,4,4,.18) 100%),
-    linear-gradient(to right, rgba(4,4,4,.85) 0%, rgba(4,4,4,.35) 55%, transparent 100%);
-}
-.pf-hero-slide img { filter: brightness(.42); }
+.pf3-chip-val  { font-size: .85rem; font-weight: 900; color: #fff; line-height: 1; font-family: 'Poppins',sans-serif; }
+.pf3-chip-lbl  { font-size: .6rem; color: rgba(255,255,255,.4); font-weight: 600; margin-top: 2px; }
 
-/* Dot indicators */
-.pf-hero-dots {
-  position: absolute; bottom: 1.6rem; inset-inline-end: 1.75rem;
-  z-index: 3; display: flex; align-items: center; gap: .45rem;
+@keyframes pf3-float {
+  from { transform: translateY(0); }
+  to   { transform: translateY(-8px); }
 }
-.pf-hdot {
-  width: 5px; height: 5px; border-radius: 99px;
-  background: rgba(255,255,255,.28); transition: all .45s ease;
-  cursor: default;
+
+/* Hero body */
+.pf3-hero-body { position: relative; z-index: 2; max-width: 900px; }
+
+.pf3-badge {
+  display: inline-flex; align-items: center; gap: 8px;
+  border: 1px solid rgba(232,40,30,.3);
+  background: rgba(232,40,30,.1);
+  padding: 6px 14px; margin-bottom: 1.75rem;
 }
-.pf-hdot.on { width: 24px; background: var(--primary); }
-.pf-hero-body {
-  position: relative; z-index: 3;
-  padding-bottom: clamp(3rem, 7vh, 6rem);
-  max-width: 780px;
+.pf3-badge-dot {
+  width: 6px; height: 6px; border-radius: 50%;
+  background: #E8281E; animation: pulse 2s infinite;
 }
-.pf-hero-eyebrow {
-  display: flex; align-items: center; gap: .75rem;
-  font-size: .7rem; font-weight: 700; letter-spacing: .2em;
-  text-transform: uppercase; color: rgba(255,255,255,.45);
-  margin: 0 0 1.5rem;
+.pf3-badge-txt {
+  font-size: .65rem; font-weight: 900; letter-spacing: .2em;
+  text-transform: uppercase; color: #E8281E;
 }
-.pf-hero-line {
-  display: block; width: 36px; height: 1px;
-  background: var(--primary);
+@keyframes pulse {
+  0%,100%{ opacity:1; transform:scale(1); }
+  50%{ opacity:.5; transform:scale(1.4); }
 }
-.pf-hero-h1 {
-  font-size: clamp(2.8rem, 7vw, 6rem);
+
+.pf3-h1 {
+  font-size: clamp(3rem, 8vw, 7rem);
   font-weight: 900; color: #fff;
-  line-height: 1.1; margin: 0 0 3rem;
+  line-height: 1.0; margin: 0 0 1.5rem;
   letter-spacing: -.02em;
 }
-.pf-hero-h1 em {
-  font-style: normal;
-  background: linear-gradient(120deg, #fff 30%, var(--primary) 100%);
+.pf3-h1-grad {
+  display: inline-block; position: relative;
+  background: linear-gradient(120deg, #E8281E 0%, #F05A28 100%);
   -webkit-background-clip: text; -webkit-text-fill-color: transparent;
   background-clip: text;
 }
-.pf-hero-foot {
-  display: flex; align-items: center;
-  justify-content: space-between; flex-wrap: wrap; gap: 2rem;
+.pf3-h1-line {
+  position: absolute; bottom: 0; left: 0; right: 0; height: 3px;
+  background: linear-gradient(90deg,#E8281E,#F05A28);
+  animation: pf3-linein .6s .8s cubic-bezier(.22,1,.36,1) both;
+  transform-origin: right;
 }
-.pf-hero-stats { display: flex; gap: 2.5rem; }
-.pf-stat { display: flex; flex-direction: column; gap: .15rem; }
-.pf-stat-n {
-  font-size: 1.5rem; font-weight: 900; color: #fff;
-  font-family: 'Poppins', sans-serif; line-height: 1;
-}
-.pf-stat-l {
-  font-size: .62rem; font-weight: 700; letter-spacing: .1em;
-  text-transform: uppercase; color: rgba(255,255,255,.3);
-}
-.pf-hero-scroll {
-  display: inline-flex; align-items: center; gap: .55rem;
-  font-size: .78rem; font-weight: 700; color: rgba(255,255,255,.5);
-  text-decoration: none; letter-spacing: .04em;
-  transition: color .25s, gap .25s;
-}
-.pf-hero-scroll:hover { color: #fff; gap: .8rem; }
+[dir="rtl"] .pf3-h1-line { transform-origin: left; }
+@keyframes pf3-linein { from{transform:scaleX(0)} to{transform:scaleX(1)} }
 
-/* ── Works section ── */
-.pf-works { padding: 5rem 0 7rem; }
+.pf3-hero-desc {
+  font-size: clamp(1rem,1.4vw,1.2rem); color: rgba(255,255,255,.45);
+  line-height: 1.75; max-width: 600px; margin-bottom: 2.5rem;
+}
 
-/* Filter nav */
-.pf-nav {
-  display: flex; flex-wrap: wrap; gap: .35rem;
-  margin-bottom: 3.5rem;
-  border-bottom: 1px solid rgba(255,255,255,.07);
-  padding-bottom: 1.5rem;
+.pf3-scroll-hint {
+  display: flex; align-items: center; gap: 12px;
 }
-.pf-nav-btn {
-  display: inline-flex; align-items: center; gap: .4rem;
-  padding: .38rem .9rem;
-  background: transparent; border: 1px solid transparent;
-  color: rgba(255,255,255,.35); font-size: .8rem; font-weight: 700;
-  cursor: pointer; border-radius: 9999px; transition: all .22s;
-  font-family: inherit; white-space: nowrap;
-}
-.pf-nav-btn:hover { color: rgba(255,255,255,.7); border-color: rgba(255,255,255,.15); }
-.pf-nav-btn.active {
-  color: #fff; border-color: var(--primary);
-  background: rgba(232,40,30,.1);
-}
-.pf-nav-count {
-  font-size: .65rem; font-family: 'Poppins', monospace;
-  color: rgba(255,255,255,.25); font-weight: 600;
-}
-.pf-nav-btn.active .pf-nav-count { color: rgba(255,255,255,.5); }
+.pf3-scroll-line { display: block; width: 32px; height: 1px; background: rgba(232,40,30,.5); }
+.pf3-scroll-txt  { font-size: .6rem; font-weight: 900; letter-spacing: .3em; text-transform: uppercase; color: rgba(255,255,255,.25); }
 
-/* Grid */
-.pf-grid {
+/* ── Sticky Filter Bar ── */
+.pf3-filter-bar {
+  position: sticky; top: 68px; z-index: 50;
+  background: rgba(3,3,3,.95);
+  backdrop-filter: blur(20px);
+  border-bottom: 1px solid rgba(255,255,255,.06);
+}
+.pf3-filter-inner {
+  display: flex; align-items: center; gap: 4px;
+  overflow-x: auto; padding: 10px 0;
+  scrollbar-width: none;
+}
+.pf3-filter-inner::-webkit-scrollbar { display: none; }
+.pf3-fdivider {
+  width: 1px; height: 20px; background: rgba(255,255,255,.1);
+  flex-shrink: 0; margin: 0 4px;
+}
+
+.pf3-fbtn {
+  position: relative; flex-shrink: 0;
+  padding: 7px 16px;
+  background: transparent; border: none; cursor: pointer;
+  font-family: inherit; font-size: .72rem; font-weight: 900;
+  letter-spacing: .15em; text-transform: uppercase;
+  color: rgba(255,255,255,.35);
+  transition: color .25s;
+}
+.pf3-fbtn:hover { color: rgba(255,255,255,.65); }
+.pf3-fbtn--active { color: #fff; }
+.pf3-fbtn-bg {
+  position: absolute; inset: 0;
+  background: linear-gradient(135deg,#E8281E,#F05A28);
+  opacity: 0; transition: opacity .25s;
+}
+.pf3-fbtn--active .pf3-fbtn-bg { opacity: 1; }
+.pf3-fbtn-inner { position: relative; z-index: 1; display: flex; align-items: center; gap: 6px; }
+.pf3-fbtn-count { font-size: .6rem; color: rgba(255,255,255,.4); font-weight: 600; }
+.pf3-fbtn--active .pf3-fbtn-count { color: rgba(255,255,255,.7); }
+
+/* ── Portfolio Grid ── */
+.pf3-works { padding: 3rem 0 5rem; background: #030303; }
+
+.pf3-grid {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
+  grid-template-columns: repeat(1, 1fr);
+  grid-auto-rows: 280px;
   gap: .75rem;
 }
-@media (min-width: 768px)  { .pf-grid { grid-template-columns: repeat(3, 1fr); gap: 1rem; } }
-@media (min-width: 1200px) { .pf-grid { grid-template-columns: repeat(4, 1fr); gap: 1.25rem; } }
+@media (min-width: 640px){
+  .pf3-grid { grid-template-columns: repeat(3, 1fr); gap: 1rem; }
+}
 
-/* Items */
-.pf-item {
-  position: relative; overflow: hidden;
-  border-radius: 10px; cursor: pointer;
-  background: #111; aspect-ratio: 3/4;
-  transition: transform .4s cubic-bezier(.25,.46,.45,.94);
-}
-.pf-item--feat {
-  grid-column: span 2;
-  aspect-ratio: 16/9;
-}
-@media (max-width: 767px) {
-  .pf-item--feat { grid-column: span 2; aspect-ratio: 4/3; }
-}
-.pf-item:hover { transform: translateY(-4px); }
+.pf3-span-wide   { grid-column: span 1; grid-row: span 1; }
+.pf3-span-tall   { grid-column: span 1; grid-row: span 1; }
+.pf3-span-normal { grid-column: span 1; grid-row: span 1; }
 
-/* Image */
-.pf-item-img {
-  position: absolute; inset: 0;
+@media (min-width: 640px){
+  .pf3-span-wide   { grid-column: span 2; grid-row: span 1; }
+  .pf3-span-tall   { grid-column: span 1; grid-row: span 2; }
+}
+
+/* Card */
+.pf3-item { position: relative; cursor: pointer; }
+.pf3-item-inner {
+  position: relative; width: 100%; height: 100%;
   overflow: hidden;
+  background: #080808;
+  border: 1px solid rgba(255,255,255,.05);
+  transform-style: preserve-3d;
+  will-change: transform;
+  transition: border-color .5s;
 }
-.pf-item-img img {
+.pf3-item:hover .pf3-item-inner {
+  border-color: rgba(232,40,30,.35);
+}
+
+.pf3-item-img-wrap {
+  position: absolute; inset: 0; overflow: hidden;
+}
+.pf3-item-img {
   width: 100%; height: 100%; object-fit: cover;
   transition: transform .65s cubic-bezier(.25,.46,.45,.94);
-}
-.pf-item:hover .pf-item-img img { transform: scale(1.06); }
-
-/* Gallery count badge */
-.pf-img-count {
-  position: absolute; top: .7rem; inset-inline-end: .7rem;
-  background: rgba(0,0,0,.6); backdrop-filter: blur(6px);
-  color: #fff; font-size: .72rem; font-weight: 600;
-  padding: .2rem .5rem; border-radius: 20px;
-  letter-spacing: .03em; line-height: 1.6;
-  display: flex; align-items: center; gap: 3px;
-  pointer-events: none; z-index: 2;
-}
-
-/* Overlay layer */
-.pf-item-layer {
-  position: absolute; inset: 0;
-  background: linear-gradient(to top, rgba(0,0,0,.9) 0%, rgba(0,0,0,.35) 45%, transparent 72%);
-  display: flex; flex-direction: column; justify-content: flex-end;
-  padding: 1.2rem;
-  opacity: .85; transition: opacity .3s;
-}
-.pf-item:hover .pf-item-layer { opacity: 1; }
-
-.pf-item-body { }
-.pf-item-cat {
   display: block;
-  font-size: .6rem; font-weight: 900; letter-spacing: .14em;
-  text-transform: uppercase; color: var(--primary);
-  margin-bottom: .35rem;
-  transform: translateY(4px); opacity: 0;
-  transition: transform .3s, opacity .3s;
 }
-.pf-item:hover .pf-item-cat { transform: translateY(0); opacity: 1; }
 
-.pf-item-title {
-  font-size: .9rem; font-weight: 900; color: #fff;
-  line-height: 1.3; margin: 0 0 .3rem;
+.pf3-item-veil {
+  position: absolute; inset: 0;
+  background: linear-gradient(to top, rgba(0,0,0,.95) 0%, rgba(0,0,0,.25) 45%, rgba(0,0,0,.05) 100%);
+  opacity: .6; transition: opacity .5s;
+}
+.pf3-item:hover .pf3-item-veil { opacity: .9; }
+
+.pf3-item-glare {
+  position: absolute; inset: 0;
+  opacity: 0; pointer-events: none;
+  transition: opacity .3s;
+}
+
+.pf3-item-topline {
+  position: absolute; top: 0; left: 0; right: 0; height: 2px;
+  background: linear-gradient(90deg,#E8281E,#F05A28);
+  transform: scaleX(0); transform-origin: right;
+  transition: transform .5s cubic-bezier(.22,1,.36,1);
+}
+[dir="rtl"] .pf3-item-topline { transform-origin: left; }
+.pf3-item:hover .pf3-item-topline { transform: scaleX(1); }
+
+.pf3-item-cat-chip {
+  position: absolute; top: 14px; right: 14px;
+  font-size: .58rem; font-weight: 900; letter-spacing: .18em;
+  text-transform: uppercase;
+  background: rgba(232,40,30,.9);
+  backdrop-filter: blur(6px);
+  color: #fff; padding: 4px 10px;
+  transform: none;
+}
+[dir="rtl"] .pf3-item-cat-chip { right: auto; left: 14px; }
+
+.pf3-item-idx {
+  position: absolute; top: 14px; left: 14px;
+  font-size: .58rem; font-weight: 700; font-family: 'Poppins',monospace;
+  color: rgba(255,255,255,.2);
+  opacity: 0; transition: opacity .35s;
+}
+[dir="rtl"] .pf3-item-idx { left: auto; right: 14px; }
+.pf3-item:hover .pf3-item-idx { opacity: 1; }
+
+.pf3-item-body {
+  position: absolute; bottom: 0; left: 0; right: 0;
+  padding: 18px 20px;
+  transform: translateY(8px);
+  transition: transform .4s cubic-bezier(.22,1,.36,1);
+}
+.pf3-item:hover .pf3-item-body { transform: translateY(0); }
+
+.pf3-item-title {
+  font-size: clamp(.85rem, 1.1vw, 1rem); font-weight: 900; color: #fff;
+  line-height: 1.3; margin: 0 0 6px;
   display: -webkit-box; -webkit-line-clamp: 2;
   -webkit-box-orient: vertical; overflow: hidden;
 }
-.pf-item--feat .pf-item-title { font-size: 1.15rem; }
+.pf3-span-wide .pf3-item-title { font-size: clamp(1rem, 1.4vw, 1.2rem); }
 
-.pf-item-meta {
-  display: flex; align-items: center; gap: .4rem;
-  font-size: .7rem; color: rgba(255,255,255,.4);
-  transform: translateY(4px); opacity: 0;
-  transition: transform .3s .05s, opacity .3s .05s;
+.pf3-item-meta {
+  display: flex; align-items: center; gap: 6px; flex-wrap: wrap;
+  font-size: .65rem; color: rgba(255,255,255,.45); font-weight: 600;
+  margin: 0;
 }
-.pf-item:hover .pf-item-meta { transform: translateY(0); opacity: 1; }
-.pf-meta-sep { opacity: .35; }
-
-/* Arrow icon */
-.pf-item-icon {
-  position: absolute; top: .9rem; inset-inline-end: .9rem;
-  width: 36px; height: 36px; border-radius: 50%;
-  background: rgba(255,255,255,.1); backdrop-filter: blur(6px);
-  border: 1px solid rgba(255,255,255,.15);
-  display: flex; align-items: center; justify-content: center;
-  color: rgba(255,255,255,.7);
-  opacity: 0; transform: scale(.8);
-  transition: opacity .3s, transform .3s;
+.pf3-meta-dot {
+  width: 4px; height: 4px; border-radius: 50%;
+  background: #E8281E; flex-shrink: 0;
 }
-.pf-item:hover .pf-item-icon { opacity: 1; transform: scale(1); }
+.pf3-meta-yr { opacity: .6; }
 
-/* Index number */
-.pf-item-idx {
-  position: absolute; top: .85rem; inset-inline-start: .85rem;
-  font-family: 'Poppins', monospace; font-size: .6rem; font-weight: 700;
-  color: rgba(255,255,255,.2);
+.pf3-item-hint {
+  display: flex; align-items: center; gap: 6px;
+  margin-top: 10px;
+  opacity: 0; transition: opacity .3s;
+  color: #E8281E; font-size: .6rem; font-weight: 900;
+  letter-spacing: .15em; text-transform: uppercase;
+}
+.pf3-item:hover .pf3-item-hint { opacity: 1; }
+
+.pf3-corner {
+  position: absolute; bottom: 0; left: 0;
+  width: 0; height: 0;
+  border-left: 36px solid rgba(232,40,30,.2);
+  border-top: 36px solid transparent;
   opacity: 0; transition: opacity .3s;
 }
-.pf-item:hover .pf-item-idx { opacity: 1; }
+[dir="rtl"] .pf3-corner { left: auto; right: 0; border-left: none; border-right: 36px solid rgba(232,40,30,.2); }
+.pf3-item:hover .pf3-corner { opacity: 1; }
 
 /* Scroll-in */
-.pf-in { opacity: 0; transform: translateY(20px); transition: opacity .55s ease, transform .55s ease; }
-.pf-in--vis { opacity: 1; transform: translateY(0); }
-.pf-grid .pf-item:nth-child(2)  { transition-delay: .05s; }
-.pf-grid .pf-item:nth-child(3)  { transition-delay: .10s; }
-.pf-grid .pf-item:nth-child(4)  { transition-delay: .15s; }
-.pf-grid .pf-item:nth-child(5)  { transition-delay: .20s; }
-.pf-grid .pf-item:nth-child(6)  { transition-delay: .24s; }
-.pf-grid .pf-item:nth-child(n+7){ transition-delay: .28s; }
+.pf3-in { opacity: 0; transform: translateY(40px) scale(.97); transition: opacity .6s ease, transform .6s cubic-bezier(.22,1,.36,1); }
+.pf3-in--vis { opacity: 1; transform: none; }
+.pf3-grid .pf3-item:nth-child(2)  { transition-delay: .06s; }
+.pf3-grid .pf3-item:nth-child(3)  { transition-delay: .12s; }
+.pf3-grid .pf3-item:nth-child(4)  { transition-delay: .16s; }
+.pf3-grid .pf3-item:nth-child(5)  { transition-delay: .2s; }
+.pf3-grid .pf3-item:nth-child(n+6){ transition-delay: .24s; }
 
 /* Empty */
-.pf-empty {
-  text-align: center; padding: 5rem 0;
-  color: rgba(255,255,255,.3);
+.pf3-empty {
+  display: none; flex-direction: column; align-items: center; justify-content: center;
+  padding: 6rem 2rem; text-align: center; gap: 1.25rem;
 }
-.pf-empty p { font-size: 1rem; margin-bottom: 1.5rem; }
-.pf-empty button {
-  padding: .5rem 1.4rem; border: 1px solid rgba(255,255,255,.2);
-  background: transparent; color: rgba(255,255,255,.5);
-  border-radius: 9999px; cursor: pointer; font-size: .8rem;
-  font-family: inherit; transition: all .25s;
+.pf3-empty-icon {
+  width: 80px; height: 80px; border: 1px solid rgba(255,255,255,.08);
+  display: flex; align-items: center; justify-content: center;
+  color: rgba(255,255,255,.2);
 }
-.pf-empty button:hover { border-color: var(--primary); color: #fff; }
+.pf3-empty h3 { font-size: 1.4rem; font-weight: 900; color: #fff; margin: 0; }
+.pf3-empty button {
+  padding: 10px 24px;
+  background: linear-gradient(135deg,#E8281E,#F05A28);
+  border: none; color: #fff; font-family: inherit;
+  font-size: .75rem; font-weight: 900; letter-spacing: .1em; text-transform: uppercase;
+  cursor: pointer; margin-top: 8px;
+}
+
+/* ── Stats + CTA ── */
+.pf3-stats-cta {
+  position: relative; overflow: hidden;
+  background: #030303;
+  padding: 5rem 0 6rem;
+}
+.pf3-dots-bg {
+  position: absolute; inset: 0; opacity: .03; pointer-events: none;
+  background: linear-gradient(to bottom, transparent, rgba(232,40,30,.03), transparent);
+}
+.pf3-sc-inner { position: relative; z-index: 1; }
+
+.pf3-stats-grid {
+  display: grid; grid-template-columns: repeat(2,1fr); gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+@media (min-width: 1024px){ .pf3-stats-grid { grid-template-columns: repeat(4,1fr); } }
+
+.pf3-stat-card {
+  position: relative; overflow: hidden;
+  border: 1px solid rgba(255,255,255,.08);
+  background: rgba(255,255,255,.02);
+  padding: 24px; group: '';
+  transition: background .3s, border-color .3s;
+}
+.pf3-stat-card:hover {
+  background: rgba(255,255,255,.05);
+  border-color: rgba(232,40,30,.3);
+}
+.pf3-stat-topline {
+  position: absolute; top: 0; left: 0; right: 0; height: 2px;
+  background: linear-gradient(90deg,#E8281E,#F05A28);
+  transform: scaleX(0); transform-origin: right;
+  transition: transform .5s cubic-bezier(.22,1,.36,1);
+}
+[dir="rtl"] .pf3-stat-topline { transform-origin: left; }
+.pf3-stat-card:hover .pf3-stat-topline { transform: scaleX(1); }
+.pf3-stat-icon {
+  width: 40px; height: 40px; margin-bottom: 14px;
+  background: rgba(232,40,30,.1); border: 1px solid rgba(232,40,30,.2);
+  display: flex; align-items: center; justify-content: center;
+  color: #E8281E;
+}
+.pf3-stat-val {
+  font-size: 1.9rem; font-weight: 900; margin: 0 0 4px;
+  background: linear-gradient(120deg,#E8281E,#F05A28);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+  font-family: 'Poppins',sans-serif;
+}
+.pf3-stat-lbl { font-size: .7rem; color: rgba(255,255,255,.4); font-weight: 600; margin: 0; }
+
+/* Stats + CTA scroll-in */
+.pf3-anim-in { opacity: 0; transform: translateY(30px); transition: opacity .6s ease, transform .6s cubic-bezier(.22,1,.36,1); }
+.pf3-anim-in.pf3-in--vis { opacity: 1; transform: none; }
+
+/* CTA block */
+.pf3-cta-block {
+  position: relative; overflow: hidden;
+  border: 1px solid rgba(255,255,255,.08);
+  background: rgba(255,255,255,.02);
+  padding: 2.5rem 2.5rem;
+}
+@media (min-width: 640px){ .pf3-cta-block { padding: 3.5rem 4rem; } }
+.pf3-cta-glow {
+  position: absolute; top: 0; right: 0;
+  width: 250px; height: 250px; border-radius: 50%;
+  background: radial-gradient(circle, rgba(232,40,30,.12) 0%, transparent 70%);
+  filter: blur(40px); pointer-events: none;
+}
+.pf3-cta-grad {
+  position: absolute; inset: 0;
+  background: linear-gradient(to right, rgba(232,40,30,.04), transparent, rgba(240,90,40,.04));
+  pointer-events: none;
+}
+.pf3-cta-content {
+  position: relative; z-index: 1;
+  display: flex; flex-direction: column; gap: 2rem;
+}
+@media (min-width: 1024px){
+  .pf3-cta-content { flex-direction: row; align-items: center; justify-content: space-between; }
+}
+.pf3-cta-left { max-width: 580px; }
+.pf3-cta-eyebrow {
+  font-size: .6rem; font-weight: 900; letter-spacing: .3em;
+  text-transform: uppercase; color: #E8281E; margin: 0 0 10px;
+}
+.pf3-cta-h3 {
+  font-size: clamp(1.6rem,3vw,2.4rem); font-weight: 900; color: #fff;
+  line-height: 1.2; margin: 0 0 12px;
+}
+.pf3-grad-txt {
+  background: linear-gradient(120deg,#E8281E,#F05A28);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+}
+.pf3-cta-desc { font-size: .95rem; color: rgba(255,255,255,.4); line-height: 1.75; margin: 0; }
+.pf3-cta-right { display: flex; flex-direction: column; gap: .75rem; flex-shrink: 0; }
+@media (min-width: 480px){ .pf3-cta-right { flex-direction: row; } }
+
+.pf3-cta-btn-primary {
+  display: inline-flex; align-items: center; gap: 8px; justify-content: center;
+  padding: 14px 32px;
+  background: linear-gradient(135deg,#E8281E,#F05A28);
+  color: #fff; font-weight: 900; font-size: .8rem;
+  letter-spacing: .05em; text-decoration: none;
+  transition: opacity .25s;
+}
+.pf3-cta-btn-primary:hover { opacity: .88; }
+.pf3-cta-btn-sec {
+  display: inline-flex; align-items: center; justify-content: center;
+  padding: 14px 32px;
+  border: 1px solid rgba(255,255,255,.15); color: #fff;
+  font-weight: 900; font-size: .8rem; text-decoration: none;
+  transition: background .25s, border-color .25s;
+}
+.pf3-cta-btn-sec:hover { background: rgba(255,255,255,.05); border-color: rgba(255,255,255,.3); }
 
 /* ════ LIGHTBOX ════ */
-#lb {
+#lb3 {
   display: none; position: fixed; inset: 0; z-index: 9000;
   flex-direction: column; align-items: center; justify-content: center;
 }
-#lb.lb--open { display: flex; animation: lb-in .28s ease; }
-@keyframes lb-in { from{opacity:0} to{opacity:1} }
+#lb3.lb3--open { display: flex; animation: lb3-in .28s ease; }
+@keyframes lb3-in { from{opacity:0} to{opacity:1} }
 
-.lb-bg {
+.lb3-bg {
   position: absolute; inset: -30px; z-index: 0;
   background-size: cover; background-position: center;
-  filter: blur(55px) brightness(.12) saturate(1.3);
+  filter: blur(55px) brightness(.1) saturate(1.5);
 }
-.lb-overlay {
+.lb3-overlay {
   position: absolute; inset: 0; z-index: 1;
-  background: rgba(0,0,0,.5); cursor: pointer;
+  background: rgba(0,0,0,.6); cursor: pointer;
 }
 
-/* Buttons */
-.lb-btn {
-  background: rgba(255,255,255,.08); backdrop-filter: blur(10px);
-  border: 1px solid rgba(255,255,255,.14); color: rgba(255,255,255,.65);
+.lb3-btn {
+  background: rgba(255,255,255,.07); backdrop-filter: blur(10px);
+  border: 1px solid rgba(255,255,255,.12); color: rgba(255,255,255,.6);
   cursor: pointer; display: flex; align-items: center; justify-content: center;
   transition: all .22s;
 }
-.lb-btn:hover { background: rgba(255,255,255,.16); color: #fff; }
+.lb3-btn:hover { background: rgba(255,255,255,.15); color: #fff; }
 
-.lb-close {
-  position: absolute; top: 1.5rem; inset-inline-start: 1.5rem; z-index: 30;
-  width: 44px; height: 44px; border-radius: 50%;
+.lb3-close {
+  position: absolute; top: 1.4rem; inset-inline-start: 1.4rem; z-index: 30;
+  width: 40px; height: 40px;
 }
-.lb-close:hover { background: var(--primary); border-color: var(--primary); color: #fff; }
+.lb3-close:hover { background: #E8281E; border-color: #E8281E; color: #fff; }
 
-.lb-counter {
-  position: absolute; top: 1.55rem; inset-inline-end: 1.5rem; z-index: 30;
-  font-size: .8rem; font-family: 'Poppins', monospace; color: rgba(255,255,255,.4);
+.lb3-counter {
+  position: absolute; top: 1.55rem; inset-inline-end: 1.4rem; z-index: 30;
+  font-size: .75rem; font-family: 'Poppins',monospace; color: rgba(255,255,255,.35);
 }
 
-.lb-arrow {
+.lb3-arrow {
   position: absolute; top: 50%; transform: translateY(-50%); z-index: 30;
-  width: 50px; height: 50px; border-radius: 50%;
+  width: 48px; height: 48px;
 }
-.lb-prev { inset-inline-start: 1.5rem; }
-.lb-next { inset-inline-end: 1.5rem; }
-@media (max-width: 640px) { .lb-arrow { display: none; } }
+.lb3-prev { inset-inline-start: 1.4rem; }
+.lb3-next { inset-inline-end: 1.4rem; }
+@media (max-width: 640px){ .lb3-arrow { display: none; } }
 
-/* Stage */
-.lb-stage {
+.lb3-stage {
   position: relative; z-index: 10;
   display: flex; align-items: center; gap: 2.5rem;
-  max-width: 1100px; width: 100%;
-  padding: 0 5rem;
+  max-width: 1100px; width: 100%; padding: 0 5rem;
 }
-@media (max-width: 900px) { .lb-stage { flex-direction: column; padding: 0 1rem; gap: 1.25rem; } }
+@media (max-width: 900px){ .lb3-stage { flex-direction: column; padding: 0 1rem; gap: 1.25rem; } }
 
-.lb-img-wrap {
+.lb3-img-wrap {
   flex: 1; display: flex; align-items: center; justify-content: center;
   max-height: 72vh;
 }
-.lb-img-wrap.lb--fade { opacity: 0; transition: opacity .2s; }
-#lb-img {
+.lb3-img-wrap.lb3--fade { opacity: 0; transition: opacity .2s; }
+#lb3-img {
   max-width: 100%; max-height: 72vh; object-fit: contain;
-  border-radius: 8px;
-  box-shadow: 0 40px 120px rgba(0,0,0,.9);
-  display: block;
+  box-shadow: 0 40px 120px rgba(0,0,0,.9); display: block;
 }
 
-.lb-info {
-  width: 240px; flex-shrink: 0;
-}
-@media (max-width: 900px) { .lb-info { width: 100%; max-width: 540px; } }
+.lb3-info { width: 260px; flex-shrink: 0; }
+@media (max-width: 900px){ .lb3-info { width: 100%; max-width: 540px; } }
 
-.lb-cat {
-  display: block;
-  font-size: .62rem; font-weight: 900; letter-spacing: .15em;
-  text-transform: uppercase; color: var(--primary); margin-bottom: .6rem;
+.lb3-info-line { width: 32px; height: 2px; background: linear-gradient(90deg,#E8281E,#F05A28); margin-bottom: 18px; }
+
+.lb3-cat {
+  display: block; font-size: .58rem; font-weight: 900; letter-spacing: .18em;
+  text-transform: uppercase;
+  background: linear-gradient(120deg,#E8281E,#F05A28);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+  margin-bottom: 8px;
 }
-.lb-title {
-  font-size: clamp(.95rem, 2vw, 1.3rem); font-weight: 900;
-  color: #fff; margin: 0 0 .65rem; line-height: 1.3;
+.lb3-title {
+  font-size: clamp(.95rem,2vw,1.3rem); font-weight: 900;
+  color: #fff; margin: 0 0 10px; line-height: 1.3;
 }
-.lb-meta {
-  font-size: .76rem; color: rgba(255,255,255,.4);
-  margin-bottom: .6rem; letter-spacing: .02em;
+.lb3-meta {
+  font-size: .72rem; color: rgba(255,255,255,.35);
+  margin-bottom: 10px; letter-spacing: .02em;
 }
-.lb-desc {
+.lb3-desc {
   font-size: .78rem; color: rgba(255,255,255,.3);
-  line-height: 1.75; margin-bottom: 1.25rem;
+  line-height: 1.75; margin-bottom: 1rem;
 }
-.lb-cta {
-  display: inline-block;
-  font-size: .8rem; font-weight: 700; color: var(--primary);
-  text-decoration: none; transition: letter-spacing .25s;
-}
-.lb-cta:hover { letter-spacing: .04em; }
 
-/* ── CTA Strip ── */
-.pf-cta {
-  border-top: 1px solid rgba(255,255,255,.06);
-  padding: 5rem 0 6rem;
+.lb3-meta-grid {
+  display: grid; grid-template-columns: 1fr 1fr; gap: .5rem; margin-bottom: 1.2rem;
 }
-.pf-cta-inner {
-  display: flex; flex-direction: column;
-  align-items: center; text-align: center; gap: 1.5rem;
+.lb3-meta-cell {
+  background: rgba(255,255,255,.03); border: 1px solid rgba(255,255,255,.07); padding: 10px 12px;
 }
-.pf-cta-inner h2 {
-  font-size: clamp(1.8rem,4vw,2.8rem); font-weight:900; color:#fff; margin:0;
+.lb3-meta-lbl { font-size: .58rem; color: rgba(255,255,255,.3); font-weight: 900; letter-spacing: .15em; text-transform: uppercase; margin: 0 0 3px; }
+.lb3-meta-val { font-size: .82rem; font-weight: 700; color: #fff; margin: 0; }
+
+.lb3-cta {
+  display: inline-flex; align-items: center; gap: 8px; width: 100%; justify-content: center;
+  padding: 13px; margin-bottom: 1rem;
+  background: linear-gradient(135deg,#E8281E,#F05A28);
+  color: #fff; font-size: .8rem; font-weight: 900; text-decoration: none;
+  transition: opacity .25s;
 }
-.pf-cta-inner p { color:rgba(255,255,255,.4); margin:0; font-size:1rem; }
-.pf-cta-btns { display:flex; align-items:center; gap:1rem; flex-wrap:wrap; justify-content:center; }
-.pf-cta-wa {
-  display:inline-flex; align-items:center; gap:.5rem;
-  padding:.65rem 1.4rem; border-radius:9999px;
-  border:1px solid rgba(255,255,255,.18); color:rgba(255,255,255,.6);
-  font-size:.86rem; font-weight:700; text-decoration:none;
-  transition:all .25s;
+.lb3-cta:hover { opacity: .88; }
+
+.lb3-nav {
+  display: flex; align-items: center; justify-content: space-between;
+  padding-top: 12px; border-top: 1px solid rgba(255,255,255,.07);
 }
-.pf-cta-wa:hover { border-color:rgba(255,255,255,.4); color:#fff; }
+.lb3-nav-btn {
+  display: flex; align-items: center; gap: 5px;
+  background: none; border: none; color: rgba(255,255,255,.35);
+  font-size: .7rem; font-weight: 700; cursor: pointer; font-family: inherit;
+  transition: color .2s;
+}
+.lb3-nav-btn:hover { color: #fff; }
+.lb3-nav-ctr { font-size: .65rem; font-family: 'Poppins',monospace; color: rgba(255,255,255,.2); }
 </style>
 
 <?php require_once __DIR__ . '/../includes/footer.php'; ?>
